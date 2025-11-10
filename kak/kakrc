@@ -1,0 +1,114 @@
+# default tab size of 4 spaces
+set-option global tabstop 4
+
+# custom theme
+colorscheme gruvbox-dark
+
+# display line numbers
+add-highlighter global/ number-lines -hlcursor -relative -separator "  " -cursor-separator " |"
+# show matching symbols
+add-highlighter global/ show-matching
+
+set-option global tabstop 4
+set-option global indentwidth 4
+
+# disable all default indent and insert hooks
+set-option global disabled_hooks '.*-indent.*|.*-insert.*'
+
+# preserve indent level
+hook global InsertChar \n %{
+    try %{ execute-keys -draft <semicolon> K <a-&> }
+}
+
+set-option global scrolloff 4,4
+
+# unselect on <esc>
+map global normal <esc> ";,"
+
+# comment lines
+map global normal <c-v> ":comment-line<ret>"
+
+map -docstring "close current buffer" global user b ": db<ret>"
+map -docstring "goto previous buffer" global user p ": bp<ret>"
+map -docstring "goto next buffer" global user n ": bn<ret>"
+
+# run the formatcmd for the current filetype on write
+hook global BufWritePre .* %{
+    try %{ format-buffer }
+}
+
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
+
+# autopairs
+plug "alexherbo2/auto-pairs.kak" config %{
+  enable-auto-pairs
+}
+
+# fzf
+plug "andreyorst/fzf.kak" config %{
+  require-module fzf
+  require-module fzf-grep
+  require-module fzf-file
+} defer fzf %{
+  set-option global fzf_highlight_command "lat -r {}"
+} defer fzf-file %{
+  set-option global fzf_file_command "fd . --no-ignore-vcs"
+} defer fzf-grep %{
+  set-option global fzf_grep_command "fd"
+}
+
+plug "andreyorst/powerline.kak" defer kakoune-themes %{
+  powerline-theme pastel
+} defer powerline %{
+  powerline-format global "git lsp bufname filetype mode_info lsp line_column position"
+  set-option global powerline_separator_thin ""
+  set-option global powerline_separator ""
+} config %{
+  powerline-start
+}
+
+plug "evanrelf/byline.kak" config %{
+  require-module "byline"
+}
+
+plug "gustavo-hms/luar" %{
+  require-module luar
+}
+
+plug "kak-lsp/kak-lsp" do %{
+  cargo install --locked --force --path .
+  # optional: if you want to use specific language servers
+  #mkdir -p ~/.config/kak-lsp
+  #cp -n kak-lsp.toml ~/.config/kak-lsp/
+}
+
+hook global WinSetOption filetype=markdown %{
+  add-highlighter -override global/markdown-wrap wrap -word
+
+  hook -once -always window WinSetOption filetype=.* %{
+    remove-highlighter global/markdown-wrap
+  }
+}
+
+# custom zig settings, basic syntax highlighting is handled by the zig.kak
+# shipped with kakoune
+hook global WinSetOption filetype=zig %{
+    set-option window formatcmd 'zig fmt --stdin'
+
+    expandtab
+
+    # Enable lsp support with semantic highlighting
+    lsp-enable-window
+    hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
+    hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
+    hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
+    hook -once -always window WinSetOption filetype=.* %{
+        remove-hooks window semantic-tokens
+    }
+}
+
+hook global WinCreate .* %{
+    eval %sh{kak-lsp --ensure-running}
+    lsp-enable
+}

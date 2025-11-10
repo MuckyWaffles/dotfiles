@@ -1,0 +1,12 @@
+{
+ "version": "0.16.0-dev.26+8b2754ad",
+ "global_cache_dir": "/home/muckywaffles/.cache/zls",
+ "global_config_dir": "/etc",
+ "local_config_dir": "/home/muckywaffles/.config",
+ "config_file": "home/muckywaffles/.config/zls.json",
+ "log_file": "/home/muckywaffles/.cache/zls/zls.log"
+ "enable_imports": true,
+ "enable_autodiscover": true,
+ "include_std": true,
+ "zig_exe_path": "/usr/bin/zig"
+}

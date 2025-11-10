@@ -1,0 +1,28 @@
+[server]
+# exit session if no requests were received during given period
+timeout = 1800 # 30 minutes
+
+# this is just for zls  and only for types/functions, the rest of the
+# highlighting is covered by regex and doesn't need semantic analysis.
+[[semantic_tokens]]
+token = "type"
+face = "module"
+modifiers = ["namespace"]
+
+[[semantic_tokens]]
+token = "type"
+face = "type"
+
+[[semantic_tokens]]
+token = "function"
+face = "function"
+
+[language.c_cpp]
+filetypes = ["c", "cpp"]
+roots = ["compile_commands.json", ".clangd"]
+command = "clangd"
+
+[language.zig]
+filetypes = ["zig"]
+roots = ["build.zig"]
+command = "zls"
