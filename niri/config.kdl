@@ -32,15 +32,16 @@ input {
     // focus-follows-mouse max-scroll-amount="0%"
 }
 
-// Running `niri msg outputs` while inside a niri instance.
-// https://github.com/YaLTeR/niri/wiki/Configuration:-Outputs
+// 'niri msg outputs' to view monitors
 output "HDMI-A-1" {
     mode "1920x1080@74.973"
-    // You can use integer or fractional scale, for example use 1.5 for 150% scale.
-    scale 1.0
-    // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
     transform "normal"
     position x=0 y=0
+}
+ouput "HDMI-A-2" {
+    mode "1920x1080@60.000"
+    transform "normal"
+    position x=1920 y=0
 }
 
 // Settings that influence how windows are positioned and sized.
